@@ -1,0 +1,100 @@
+import pygame
+import random
+
+# inicializa o Pygame
+pygame.init()
+
+# define as cores que serão usadas no jogo
+BRANCO = (255, 255, 255)
+PRETO = (0, 0, 0)
+VERMELHO = (255, 0, 0)
+
+# define o tamanho da tela do jogo
+tela = pygame.display.set_mode((800, 600))
+
+# define a fonte que será usada para exibir a pontuação
+fonte = pygame.font.SysFont(None, 25)
+
+# define a classe para o jogador
+class Jogador(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((50, 50))
+        self.image.fill(VERMELHO)
+        self.rect = self.image.get_rect()
+        self.rect.center = (400, 550)
+
+    def update(self):
+        # move o jogador com as teclas de seta
+        teclas = pygame.key.get_pressed()
+        if teclas[pygame.K_LEFT]:
+            self.rect.x -= 5
+        if teclas[pygame.K_RIGHT]:
+            self.rect.x += 5
+
+        # mantém o jogador dentro da tela
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > 800:
+            self.rect.right = 800
+
+    def disparar(self):
+        # cria uma nova bala
+        bala = Bala(self.rect.centerx, self.rect.top)
+        todos_sprites.add(bala)
+        balas.add(bala)
+
+# define a classe para os alvos
+class Alvo(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((25, 25))
+        self.image.fill(BRANCO)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(800 - self.rect.width)
+        self.rect.y = random.randrange(-100, -40)
+        self.velocidade = random.randrange(1, 8)
+
+    def update(self):
+        # move o alvo para baixo
+        self.rect.y += self.velocidade
+
+        # remove o alvo quando ele sai da tela
+        if self.rect.top > 600:
+            self.kill()
+
+# define a classe para as balas
+class Bala(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((5, 10))
+        self.image.fill(PRETO)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.velocidade = -10
+
+    def update(self):
+        # move a bala para cima
+        self.rect.y += self.velocidade
+
+        # remove a bala quando ela sai da tela
+        if self.rect.bottom < 0:
+            self.kill()
+
+# cria os grupos de sprites
+todos_sprites = pygame.sprite.Group()
+alvos = pygame.sprite.Group()
+balas = pygame.sprite.Group()
+
+# cria o jogador e o adiciona ao grupo de sprites
+jogador = Jogador()
+todos_sprites.add(jogador)
+
+# loop principal do jogo
+pontuacao = 0
+terminou = False
+while not terminou:
+    # verifica eventos
+    for evento in pygame.event.get():
+        if evento.type
